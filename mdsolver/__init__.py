@@ -34,29 +34,26 @@ class MDSolver:
                        T=5,
                        dt=0.01):
 
+        self.compute_poteng = False
         self.boundaries = boundaries
 
         # Define time scale and number of steps
-        self.T = T
         self.dt = dt
         self.N = int(T/dt)
-        self.time = np.linspace(0, T, self.N)
 
         # Initialize positions
-        r0 = positions()
-        self.numparticles = len(r0)
-        self.numdimensions = len(r0[0])
-        #self.r = np.zeros((self.N+1, self.numparticles, self.numdimensions))
-        self.r = np.asarray(r0)
+        self.r = positions()
+        self.numparticles = self.r.shape[0]
+        self.numdimensions = self.r.shape[1]
 
         # Initialize velocities
-        #self.v = np.zeros(self.r.shape)
         self.v = velocities(self.numparticles, self.numdimensions)
 
         # print to terminal
         self.print_to_terminal()
 
-        self.compute_poteng = False
+        self.dump(np.inf, "file.dump")
+        self.thermo(np.inf, "file.thermo")
 
     def __repr__(self):
         return """MDSolver is the heart of the molecular dynamics code.
@@ -84,8 +81,9 @@ class MDSolver:
         print("Number of particles:  ", self.numparticles)
         print("Number of dimensions: ", self.numdimensions)
         print("Boundary conditions:  ", self.boundaries)
-        print("Total time:           ", self.T, "\tps")
+        print("Time steps:           ", self.N)
         print("Timestep:             ", self.dt, "\tps")
+        print("Total time:           ", self.N * self.dt)
         print(50 * "=" + "\n\n")
 
     @staticmethod

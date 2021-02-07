@@ -63,17 +63,17 @@ class LennardJones(Potential):
         ndarray
             current distance matrix
         """
-        return self.compute_force(r, self.numparticles, self.numdimensions, self.cutoffSqrd, return_energy) #, self.checkDistance)
+        return self.compute_force(r, self.numparticles, self.numdimensions, self.cutoffSqrd, return_energy, self.checkDistance)
 
     @staticmethod
     @jit(nopython=True)
-    def compute_force(r, numparticles, numdimensions, cutoffSqrd, return_energy): #, checkDistance):
+    def compute_force(r, numparticles, numdimensions, cutoffSqrd, return_energy, checkDistance):
         poteng = 0
         force = np.zeros((numparticles, numdimensions))
         for i in range(numparticles):
             for j in range(i):
                 R = r[i] - r[j]
-                # R = checkDistance(R)
+                R = checkDistance(R)
                 R_norm_sqrd = np.sum(R**2)
                 if R_norm_sqrd < cutoffSqrd:
                     R6 = R_norm_sqrd**(-3)

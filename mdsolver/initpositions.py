@@ -1,5 +1,8 @@
-class InitPositions:
-    """ Initial positions class. Set the initial positions according
+from numpy import asarray, zeros
+
+
+class InitPosition:
+    """ Initial position class. Set the initial positions according
     to some method.
     """
     def __init__(self):
@@ -9,31 +12,31 @@ class InitPositions:
         raise NotImplementedError ("Class {} has no instance '__call__'."
                                    .format(self.__class__.__name__))
 
-class Manual(InitPositions):
-    """ Specify the positions manually using a nested list. By using
+class SetPosition(InitPosition):
+    """ Specify the position manually using a nested list. By using
     this method, the user has done all the work and the class will
     just return the user input.
 
     Parameters
     ----------
-    positions : array_like
+    position : array_like
         initial positions of all the particles. With this array, the user
         also specifies the number of particles and number of dimensions.
     """
-    def __init__(self, positions):
-        self.positions = positions
+    def __init__(self, position):
+        self.position = position
 
     def __call__(self):
-        """ Get the initial positions.
+        """ Get the initial position.
 
         Returns
         -------
         ndarray
             initial particle configuration
         """
-        return self.positions
+        return asarray(self.position)
 
-class FCC(InitPositions):
+class FCC(InitPosition):
     """ Creating a face-centered cube of n^dim unit cells with
     4 particles in each unit cell. The number of particles
     then becomes (dim+1) * n ^ dim. Each unit cell has a
@@ -54,14 +57,13 @@ class FCC(InitPositions):
         self.dim = dim
 
     def __call__(self):
-        """ Get the initial positions.
+        """ Get the initial position.
 
         Returns
         -------
         ndarray
             initial particle configuration
         """
-        from numpy import zeros
         par = (self.dim+1) * self.cells ** self.dim
         r = zeros((par, self.dim))
         counter = 0

@@ -1,5 +1,5 @@
-from numba import jitclass
 import numpy as np
+from numba import jit, jitclass, float64
 
 class Boundaries:
     """ Boundary condition class. Ensures that the positions, velocities
@@ -56,6 +56,7 @@ class Open(Boundaries):
         return v
 
     @staticmethod
+    @jit(nopython=False)
     def checkDistance(dr):
         """ Check if the distance vectors satisfy the boundary conditions.
 
@@ -112,6 +113,7 @@ class Reflective(Boundaries):
         return np.where(self.r//self.lenbox == 0, v, -v)
 
     @staticmethod
+    @jit(nopython=True)
     def checkDistance(dr):
         """ Check if the distance vectors satisfy the boundary conditions.
 
@@ -127,6 +129,10 @@ class Reflective(Boundaries):
         """
         return dr
 
+
+spec = [("lenbox", float64)]
+
+@jitclass(spec)
 class Periodic(Boundaries):
     def __init__(self, lenbox):
         self.lenbox = lenbox

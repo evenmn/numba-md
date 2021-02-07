@@ -56,8 +56,6 @@ class ForwardEuler(Integrator):
             new acceleration array
         u : float
             potential energy of the new state
-        d : ndarray
-            distance matrix of the new state
         """
         r, v, a = r.copy(), v.copy(), a.copy()
         r += v * self.dt
@@ -113,8 +111,6 @@ class EulerChromer(Integrator):
             new acceleration array
         u : float
             potential energy of the new state
-        d : ndarray
-            distance matrix of the new state
         """
         r, v, a = r.copy(), v.copy(), a.copy()
         v += a * self.dt
@@ -169,8 +165,6 @@ class VelocityVerlet(Integrator):
             new acceleration array
         u : float
             potential energy of the new state
-        d : ndarray
-            distance matrix of the new state
         """
         r, v, a = r.copy(), v.copy(), a.copy()
         r += v * self.dt + 0.5 * a * self.dt**2
