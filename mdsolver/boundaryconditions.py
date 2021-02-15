@@ -1,5 +1,7 @@
 import numpy as np
-from numba import jit, jitclass, float64
+from numba import jit  # , float64
+# from numba.experimental import jitclass
+
 
 class Boundaries:
     """ Boundary condition class. Ensures that the positions, velocities
@@ -9,8 +11,9 @@ class Boundaries:
         pass
 
     def checkPosition(self, r):
-        raise NotImplementedError ("Class {} has no instance 'checkPosition'."
-                                   .format(self.__class__.__name__))
+        raise NotImplementedError("Class {} has no instance 'checkPosition'."
+                                  .format(self.__class__.__name__))
+
 
 class Open(Boundaries):
     """ Open boundary conditions. Does not alter positions, velocities or
@@ -56,7 +59,7 @@ class Open(Boundaries):
         return v
 
     @staticmethod
-    @jit(nopython=False)
+    @jit(nopython=True)
     def checkDistance(dr):
         """ Check if the distance vectors satisfy the boundary conditions.
 
@@ -72,12 +75,13 @@ class Open(Boundaries):
         """
         return dr
 
+
 class Reflective(Boundaries):
     def __init__(self, lenbox):
         self.lenbox = lenbox
 
     def __repr__(self):
-        return "Reflective boundaries with box length {}".format(self.lenbox)
+        return f"Reflective boundaries with box length {self.lenbox}"
 
     def checkPosition(self, r):
         """ Check if the positions satisfy the boundary conditions.
@@ -93,8 +97,8 @@ class Reflective(Boundaries):
             changed position array
         """
         self.r = r
-        r = np.where(r>self.lenbox, 2*self.lenbox - r, r)
-        r = np.where(r<0, - r, r)
+        r = np.where(r > self.lenbox, 2 * self.lenbox - r, r)
+        r = np.where(r < 0, - r, r)
         return r
 
     def checkVelocity(self, v):
@@ -130,15 +134,13 @@ class Reflective(Boundaries):
         return dr
 
 
-spec = [("lenbox", float64)]
-
-@jitclass(spec)
+# @jitclass([("lenbox", float64)])
 class Periodic(Boundaries):
     def __init__(self, lenbox):
         self.lenbox = lenbox
 
     def __repr__(self):
-        return "Periodic boundaries with box length {}".format(self.lenbox)
+        return f"Periodic boundaries with box length {self.lenbox}"
 
     def checkPosition(self, r):
         """ Check if the positions satisfy the boundary conditions.
@@ -171,7 +173,9 @@ class Periodic(Boundaries):
         """
         return v
 
-    def checkDistance(self, dr):
+    @staticmethod
+    @jit(nopython=True)
+    def checkDistance(dr):
         """ Check if the distance vectors satisfy the boundary conditions.
 
         Parameters
@@ -184,5 +188,6 @@ class Periodic(Boundaries):
         ndarray
             changed distance vectors
         """
-        dr -= np.round(dr/self.lenbox) * self.lenbox
+        lenbox = 12
+        dr -= np.round(dr/lenbox, 0, np.empty_like(dr)) * lenbox
         return dr
